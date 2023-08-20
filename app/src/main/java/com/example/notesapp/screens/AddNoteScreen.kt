@@ -90,21 +90,6 @@ fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
         desWords = note.desWords
         dateTime = note.dateTime
     }
-    var month = when(current.subSequence(5,7)) {
-        "01" -> "Jan"
-        "02" -> "Feb"
-        "03" -> "Mar"
-        "04" -> "Apr"
-        "05" -> "May"
-        "06" -> "Jun"
-        "07" -> "Jul"
-        "08" -> "Aug"
-        "09" -> "Sep"
-        "10" -> "Oct"
-        "11" -> "Nov"
-        "12" -> "Dec"
-        else -> "error"
-    }
     BackHandler(true) {
         onSaveNote()
         scope.launch {
@@ -150,7 +135,7 @@ fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
                     textStyle = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 )
             }
-            Text(text = "$month ${dateTime.subSequence(8,16)} | $desWords words", modifier = Modifier
+            Text(text = "${dateTime} | $desWords words", modifier = Modifier
                 .padding(start = 25.dp)
                 .background(MaterialTheme.colorScheme.background), fontSize = 11.sp)
 
