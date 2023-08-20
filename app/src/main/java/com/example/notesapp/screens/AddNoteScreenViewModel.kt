@@ -21,7 +21,7 @@ class AddNoteScreenViewModel(context: Context, onSaveNote1: String): ViewModel()
         onSaveNote1.toInt()
     }
 
-    val note = dao.getItem(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), NoteItem(8,"NoTitle","NoDeSC"))
+    val note = dao.getItem(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), NoteItem(8,"NoTitle","NoDeSC", 0))
 
 
 

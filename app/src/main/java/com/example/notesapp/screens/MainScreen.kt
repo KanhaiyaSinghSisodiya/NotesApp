@@ -103,8 +103,25 @@ fun ContactScreen(state: List<NoteItem>, onAddNote: (String) -> Unit) {
                     .padding(5.dp),
                     verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
+
+                    var month = when(it.dateTime.subSequence(5,7)) {
+                        "01" -> "Jan"
+                        "02" -> "Feb"
+                        "03" -> "Mar"
+                        "04" -> "Apr"
+                        "05" -> "May"
+                        "06" -> "Jun"
+                        "07" -> "Jul"
+                        "08" -> "Aug"
+                        "09" -> "Sep"
+                        "10" -> "Oct"
+                        "11" -> "Nov"
+                        "12" -> "Dec"
+                        else -> "error"
+                    }
+
                     Text(text = it.title, fontWeight = FontWeight.W700, modifier = Modifier.padding(start = 8.dp, top = 4.dp))
-                    Text(text = "17 Aug 2023 ", fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp, bottom = 4.dp))
+                    Text(text = "$month ${it.dateTime.subSequence(8,16)}", fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp, bottom = 4.dp))
                 }
             }
 

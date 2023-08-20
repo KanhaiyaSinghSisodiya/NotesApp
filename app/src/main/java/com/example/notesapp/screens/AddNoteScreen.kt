@@ -2,6 +2,7 @@ package com.example.notesapp.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,8 @@ import com.example.notesapp.ui.theme.Blue
 import com.example.notesapp.ui.theme.LightBlue
 
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -53,6 +56,7 @@ import kotlinx.coroutines.launch
 fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
     val viewModel: AddNoteScreenViewModel = viewModel(factory = MyViewModelFactor(LocalContext.current, flagString))
     val dao = viewModel.dao
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val note by viewModel.note.collectAsStateWithLifecycle()
 
@@ -66,20 +70,48 @@ fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
     )
 
     var des by remember {
-        mutableStateOf("Description")
+        mutableStateOf("")
     }
+    var desWords by remember {
+        mutableStateOf(0)
+    }
+
+    val calendar = Calendar.getInstance()
+    val formatter = SimpleDateFormat("YYYY MM dd HH:mm")
+    val current = formatter.format(calendar.time)
+
+    var dateTime by remember {
+        mutableStateOf(current)
+    }
+
     if(flagString != "ADD") {
         title = note.title
         des = note.description
+        desWords = note.desWords
+        dateTime = note.dateTime
     }
-
+    var month = when(current.subSequence(5,7)) {
+        "01" -> "Jan"
+        "02" -> "Feb"
+        "03" -> "Mar"
+        "04" -> "Apr"
+        "05" -> "May"
+        "06" -> "Jun"
+        "07" -> "Jul"
+        "08" -> "Aug"
+        "09" -> "Sep"
+        "10" -> "Oct"
+        "11" -> "Nov"
+        "12" -> "Dec"
+        else -> "error"
+    }
     BackHandler(true) {
-        scope.launch {
-            if(flagString.equals("ADD"))    dao.upsert(NoteItem(title = title, description = des))
-            else    dao.upsert(NoteItem(id = note.id, title = title, description = des))
-        }
         onSaveNote()
-        Log.d("jkk","jkkk")
+        scope.launch {
+            if(flagString.equals("ADD"))    dao.upsert(NoteItem(title = title, description = des, desWords = desWords, dateTime = dateTime))
+            else    dao.upsert(NoteItem(id = note.id, title = title, description = des, desWords = desWords, dateTime = dateTime))
+        }
+
     }
 
     Scaffold(
@@ -99,7 +131,14 @@ fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
             .padding(it)
             .fillMaxSize()) {
             CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-                TextField(value = title, onValueChange = {title = it}, modifier = Modifier
+                TextField(value = title, onValueChange = {
+                    if(it.length<30) {
+                        title = it
+                    }
+                    else {
+                        Toast.makeText(context, "Maximum length of title reached", Toast.LENGTH_SHORT).show()
+                    }
+                }, modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 10.dp, start = 10.dp), colors = TextFieldDefaults.textFieldColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -111,13 +150,18 @@ fun AddNoteScreen(flagString: String, onSaveNote: () -> Unit) {
                     textStyle = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 )
             }
-            Text(text = "August 19 16:18 Sat | 5 words", modifier = Modifier
+            Text(text = "$month ${dateTime.subSequence(8,16)} | $desWords words", modifier = Modifier
                 .padding(start = 25.dp)
                 .background(MaterialTheme.colorScheme.background), fontSize = 11.sp)
 
             CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
 
-                TextField(value = des, onValueChange = {des = it}, modifier = Modifier
+                TextField(value = des, onValueChange = {
+                     des = it
+                     desWords = it.length
+                    val t = Calendar.getInstance().time
+                    dateTime = formatter.format(t)
+                     }, modifier = Modifier
                     .fillMaxSize()
                     .padding(start = 10.dp), colors = TextFieldDefaults.textFieldColors(
                     containerColor = MaterialTheme.colorScheme.background,

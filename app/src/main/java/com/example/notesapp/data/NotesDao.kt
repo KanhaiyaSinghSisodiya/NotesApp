@@ -14,7 +14,7 @@ interface NotesDao {
     @Upsert
     suspend fun upsert(item: NoteItem)
 
-    @Query("SELECT * FROM NOTESTABLE")
+    @Query("SELECT * FROM NOTESTABLE ORDER BY dateTime DESC")
     fun getAllItems(): Flow<List<NoteItem>>
 
     @Query("SELECT * from NOTESTABLE WHERE id = :id")
